@@ -17,7 +17,7 @@ public class UserOuterService {
     private UserInnerService userInnerService;
 
     /**
-     * readOnly = true에 따라 Read DB에서 데이터를 읽는다.
+     * readOnly = true : read data from readDataSource
      *
      */
     @Transactional(readOnly = true)
@@ -26,7 +26,7 @@ public class UserOuterService {
     }
 
     /**
-     * readOnly = false에 따라 Write DB에서 데이터를 읽는다.
+     * readOnly = false : read data from writeDataSource
      *
      */
     @Transactional(readOnly = false)
@@ -40,38 +40,36 @@ public class UserOuterService {
     }
 
     /**
-     * 비록 {@link UserInnerService#findByUserIdWithPropagationRequired(Integer)} 가 readOnly = true라 하여도
-     * Propagation.REQUIRED는 기존 트랜잭션이 존재할 경우 기존 트랜잭션과 커넥션을 재사용하기 때문에 바깥 트랜잭션을 따라
-     * Write DB로 요청을 보낸다.
-     * <p/>
-     * 물론 기존 트랜잭션이 존재하지 않을 경우에는 새로운 트랜잭션을 맺기 때문에 올바르게 작동한다.
+     * Propagation.REQUIRED test
      */
     @Transactional(readOnly = false)
     public Map<String, User> findByIdWriteAndInnerReadWithPropagationRequired(Integer outerFirstId, Integer innerId, Integer outerSecondId) {
         Map<String, User> users = new HashMap<String, User>();
         users.put("outerFirstUser", userRepository.findById(outerFirstId));
+
+        // @Transactional(readOnly = true) but because of propagation = REQUIRED and outerService's @Transaction(readOnly = false)
+        // it's transaction is readOnly=false.
         users.put("innerUser", userInnerService.findByUserIdWithPropagationRequired(innerId));
         users.put("outerSecondUser", userRepository.findById(outerSecondId));
         return users;
     }
 
     /**
-     * {@link UserInnerService#findByUserIdWithPropagationRequiresNew(Integer)}가 readOnly = true이고,
-     * Propagation.REQUIRES_NEW이면 기존 트랜잭션이 아닌 새로운 트랜잭션을 생성하며 새로운 커넥션을 맺는다.
-     * 따라서 innerUser를 read DB에서 읽어오게 된다.
+     * Propagation.REQUIRES_NEW test
      */
     @Transactional(readOnly = false)
     public Map<String, User> findByIdWriteAndInnerReadWithPropagationRequiresNew(Integer outerFirstId, Integer innerId, Integer outerSecondId) {
         Map<String, User> users = new HashMap<String, User>();
         users.put("outerFirstUser", userRepository.findById(outerFirstId));
+
+        // always readOnly = true because of REQUIRES_NEW
         users.put("innerUser", userInnerService.findByUserIdWithPropagationRequiresNew(innerId));
         users.put("outerSecondUser", userRepository.findById(outerSecondId));
         return users;
     }
 
     /**
-     * {@link UserOuterService#findByIdWriteAndInnerReadWithPoropagationMandatory(Integer, Integer, Integer)}는
-     * 항상 바깥 트랜잭션을 따르기 때문에 바깥 트랜잭션과 커넥션을 재사용한다. 따라서 readOnly=true라도 Write DB에서 값을 읽어온다.
+     * Prapagation.MADATORY test
      */
     @Transactional(readOnly = false)
     public Map<String, User> findByIdWriteAndInnerReadWithPoropagationMandatory(Integer outerFirstId, Integer innerId, Integer outerSecondId) {

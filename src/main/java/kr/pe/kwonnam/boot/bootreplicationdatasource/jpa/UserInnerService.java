@@ -18,6 +18,10 @@ public class UserInnerService {
         return userRepository.findById(id);
     }
 
+
+    /**
+     * Because of Propagation.REQUIRES_NEW, this method's transaction is always readOnly = true
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public User findByUserIdWithPropagationRequiresNew(Integer id) {
         return userRepository.findById(id);

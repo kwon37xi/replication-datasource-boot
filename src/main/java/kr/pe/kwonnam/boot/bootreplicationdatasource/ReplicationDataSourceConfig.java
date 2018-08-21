@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import java.util.Map;
 
 /**
  * Replication DataSources Configuration
+ *
+ * <code>@Primary</code> and <code>@DependsOn</code> are the key requirements for Spring Boot.
  */
 @Configuration
 public class ReplicationDataSourceConfig {
@@ -32,10 +35,8 @@ public class ReplicationDataSourceConfig {
     }
 
     /**
-     * {@link org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource}는
-     * {@link org.springframework.beans.factory.InitializingBean}을 구현하므로,
-     * 명시적으로 afterPropertiesSet()메소드를 호출하거나
-     * 별도 @Bean으로 만들어 Spring Life Cycle을 타도록 해야 한다.
+     * AbstractRoutingDataSource and it's sub classes must be initialized as Spring Bean for calling
+     * {@link AbstractRoutingDataSource#afterPropertiesSet()}.
      */
     @Bean
     public DataSource routingDataSource() {
