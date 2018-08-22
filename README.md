@@ -1,8 +1,10 @@
 # Replication DataSource for Spring Boot 2
 
-You can see the basic idea of replication routing datasource in [Java (Spring & Non Spring) replication-datasource project](https://github.com/kwon37xi/replication-datasource).
+You will see how to route database connections to the master DB and the slave DBs with Spring's `@Transactional(readOnly=true|false)` in this example code.
 
-This is an example of Spring Boot 2 with `LazyConnectionDataSourceProxy` + `AbstractRoutingDataSource`.
+You can find the basic idea of replication routing datasource in [Java (Spring & Non Spring) replication-datasource project](https://github.com/kwon37xi/replication-datasource).
+
+This is an example for Spring Boot 2 with `LazyConnectionDataSourceProxy` + `AbstractRoutingDataSource`.
 
 
 ## Configuration for Spring boot 2
